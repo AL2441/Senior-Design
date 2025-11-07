@@ -142,11 +142,21 @@ int main(void)
    HAL_SPI_Transmit(&hspi1, (uint8_t *)&cmd, 1, HAL_MAX_DELAY);
    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
 
-   // Send data character 'A' → 0x200 + 0x41 = 0x241
-   cmd = 0x242;
-   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
-   HAL_SPI_Transmit(&hspi1, (uint8_t *)&cmd, 1, HAL_MAX_DELAY);
-   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
+//   // Send data character 'A' → 0x200 + 0x41 = 0x241
+//   cmd = 0x242;
+//   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
+//   HAL_SPI_Transmit(&hspi1, (uint8_t *)&cmd, 1, HAL_MAX_DELAY);
+//   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
+
+   const char *msg = "Collision detected";
+   for (int i = 0; msg[i] != '\0'; i++) {
+       cmd = 0x200 + msg[i];  // Add 0x200 to mark as data
+       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET); // CS low
+       HAL_SPI_Transmit(&hspi1, (uint8_t *)&cmd, 1, HAL_MAX_DELAY);
+       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);   // CS high
+       HAL_Delay(2); // small delay between chars
+   }
+
   while (1)
   {
     /* USER CODE END WHILE */
